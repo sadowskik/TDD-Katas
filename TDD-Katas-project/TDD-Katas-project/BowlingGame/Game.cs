@@ -7,63 +7,57 @@ namespace TDD_Katas_project.BowlingGame
     public class Game : AggregateBase
     {
         private readonly IList<Roll> _rolls = new List<Roll>();
-        private readonly IList<Spare> _spares = new List<Spare>();
+        private readonly IList<Frame> _frames = new List<Frame>();
 
         protected void When(BallRolled @event)
         {
-            var newRoll = new Roll(@event.PinsKnockedDown);
+            var newRoll = new Roll(@event.PinsKnockedDown);            
+
+            if (_rolls.Count % 2 == 0)
+                _frames.Add(new Frame(newRoll));
+            else
+                _frames.Last().SecondRoll = newRoll;
+
             _rolls.Add(newRoll);
-
-            var lastSpare = _spares.LastOrDefault();
-            if (lastSpare != null && lastSpare.InFrame == _rolls.Count)
-                lastSpare.NextRoll = newRoll;
-
-            if (_rolls.Last().PinsKnockedDown == 5 && _rolls[_rolls.Count - 2].PinsKnockedDown == 5)
-                RaiseEvent(new SpareRolled(inFrame: _rolls.Count));
-        }
-
-        protected void When(SpareRolled @event)
-        {
-            _spares.Add(new Spare(@event.InFrame));
         }
 
         public void Score()
         {
             int total = 0;
 
-            foreach (var spare in _spares)
+            for (int i = 0; i < _frames.Count; i++)
             {
-                //???
+                total += _frames[i].Score();
+
+                if (_frames[i].IsSpare())
+                    total += _frames[i + 1].FirstRoll.PinsKnockedDown;
             }
 
-            RaiseEvent(new GameScored(_rolls.Sum(x => x.PinsKnockedDown)));
+            RaiseEvent(new GameScored(total));
         }
     }
 
-    public class SpareRolled : IEvent
+    public class Frame
     {
-        public int InFrame { get; private set; }
-
-        public SpareRolled(int inFrame)
+        public Frame(Roll firstRoll)
         {
-            InFrame = inFrame;
+            FirstRoll = firstRoll;
         }
-    }
 
-    public class Spare
-    {
-        public int InFrame { get; private set; }
+        public Roll FirstRoll { get; private set; }
 
-        public Roll NextRoll { get; set; }
+        public Roll SecondRoll { get; set; }
 
-        public Spare(int inFrame)
+        public bool IsSpare()
         {
-            InFrame = inFrame;
+            return FirstRoll.PinsKnockedDown == 5
+                   && SecondRoll != null
+                   && SecondRoll.PinsKnockedDown == 5;
         }
 
         public int Score()
         {
-            return 10 + (NextRoll != null ? NextRoll.PinsKnockedDown : 0);
+            return FirstRoll.PinsKnockedDown + SecondRoll.PinsKnockedDown;
         }
     }
 

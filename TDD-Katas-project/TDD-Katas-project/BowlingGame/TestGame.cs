@@ -36,10 +36,12 @@ namespace TDD_Katas_project.BowlingGame
         }
 
         [Test]
-        public void Should_Score_One_Spare()
+        public void Should_Score_Game_With_One_Spare()
         {
+            //TODO: make cleaner
             Given(
-                Spare(),                 
+                Spare(),
+                new IEvent[] {new BallRolled(pinsKnockedDown: 3)},
                 RollMany(pinsKnockedDown: 0, times: 17));
 
             Sut.Score();
@@ -58,7 +60,7 @@ namespace TDD_Katas_project.BowlingGame
             return new IEvent[]
             {
                 new BallRolled(pinsKnockedDown: 5),
-                new BallRolled(pinsKnockedDown: 5)
+                new BallRolled(pinsKnockedDown: 5)                
             };
         }
     }    
