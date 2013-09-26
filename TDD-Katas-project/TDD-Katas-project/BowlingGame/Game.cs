@@ -6,6 +6,8 @@ namespace TDD_Katas_project.BowlingGame
 {
     public class Game : AggregateBase
     {
+        private const int TypicalNumberOfFrames = 10;
+
         private readonly IList<Roll> _rolls = new List<Roll>();
         private readonly IList<Frame> _frames = new List<Frame>();
 
@@ -34,12 +36,12 @@ namespace TDD_Katas_project.BowlingGame
         {
             int total = 0;
 
-            for (int i = 0; i < _frames.Count; i++)
+            for (int i = 0; i < TypicalNumberOfFrames; i++)
             {
                 total += _frames[i].Score();
 
                 if (_frames[i].IsStrike())
-                    total += _frames[i + 1].Score();
+                    total += _frames[i + 1].Score() + _frames[i + 2].Score();
                 else if (_frames[i].IsSpare())
                     total += _frames[i + 1].FirstRoll.PinsKnockedDown;
             }

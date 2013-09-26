@@ -64,6 +64,17 @@ namespace TDD_Katas_project.BowlingGame
             Expect(new GameScored(24));
         }
 
+        [Test]
+        public void Should_Score_Perfect_Game()
+        {            
+            Given(                
+                RollMany(pinsKnockedDown: 10, times: 12));
+
+            Sut.Score();
+
+            Expect(new GameScored(300));
+        }
+
         private static IEnumerable<BallRolled> RollMany(int pinsKnockedDown, int times)
         {            
             for (int i = 0; i < times; i++)
@@ -79,11 +90,11 @@ namespace TDD_Katas_project.BowlingGame
             };
         }
 
-        private static IEvent[] Strike()
+        private static IEnumerable<IEvent> Strike()
         {
             return new IEvent[]
             {
-                new BallRolled(pinsKnockedDown: 10),                              
+                new BallRolled(pinsKnockedDown: 10)                         
             };
         }
     }    
