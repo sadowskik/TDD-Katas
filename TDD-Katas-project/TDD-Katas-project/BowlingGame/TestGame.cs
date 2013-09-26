@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using TDD_Katas_project.BowlingGame.Infrastructure;
 
 namespace TDD_Katas_project.BowlingGame
@@ -34,35 +35,31 @@ namespace TDD_Katas_project.BowlingGame
             Expect(new GameScored(score: 20));
         }
 
-        private static IEvent[] RollMany(int pinsKnockedDown, int times)
+        [Test]
+        public void Should_Score_One_Spare()
         {
-            var rolls = new IEvent[times];
+            Given(
+                Spare(),                 
+                RollMany(pinsKnockedDown: 0, times: 17));
 
+            Sut.Score();
+
+            Expect(new GameScored(16));
+        }
+
+        private static IEnumerable<BallRolled> RollMany(int pinsKnockedDown, int times)
+        {            
             for (int i = 0; i < times; i++)
-                rolls[i] = new BallRolled(pinsKnockedDown);
-
-            return rolls;
+                yield return new BallRolled(pinsKnockedDown);            
         }
-    }
 
-
-    public class GameScored : IEvent
-    {
-        public int Score { get; private set; }
-
-        public GameScored(int score)
+        private static IEnumerable<IEvent> Spare()
         {
-            Score = score;
+            return new IEvent[]
+            {
+                new BallRolled(pinsKnockedDown: 5),
+                new BallRolled(pinsKnockedDown: 5)
+            };
         }
-    }
-
-    public class BallRolled : IEvent
-    {
-        public int PinsKnockedDown { get; private set; }
-
-        public BallRolled(int pinsKnockedDown)
-        {
-            PinsKnockedDown = pinsKnockedDown;
-        }
-    }
+    }    
 }

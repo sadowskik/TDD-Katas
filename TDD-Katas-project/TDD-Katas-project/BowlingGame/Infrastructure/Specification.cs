@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -25,6 +27,12 @@ namespace TDD_Katas_project.BowlingGame.Infrastructure
         protected void Given(params IEvent[] events)
         {
             foreach (var @event in events)
+                Sut.ApplyEvent(@event);
+        }
+
+        protected void Given(params IEnumerable<IEvent>[] events)
+        {
+            foreach (var @event in events.SelectMany(x => x))
                 Sut.ApplyEvent(@event);
         }
 
