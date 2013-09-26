@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using TDD_Katas_project.BowlingGame.Infrastructure;
 
 namespace TDD_Katas_project.BowlingGame
@@ -17,17 +15,36 @@ namespace TDD_Katas_project.BowlingGame
         [Test]
         public void Should_Score_Gutter_Game()
         {
-            Given(GutterGame().ToArray());
+            Given(
+                RollMany(pinsKnockedDown: 0, times: 20));
+
             Sut.Score();
+
             Expect(new GameScored(score: 0));
         }
 
-        private static IEnumerable<IEvent> GutterGame()
+        [Test]
+        public void Should_Score_Game_With_All_Ones()
         {
-            for (int i = 0; i < 20; i++)
-                yield return new BallRolled(pinsKnockedDown: 0);
-        } 
+            Given(
+                RollMany(pinsKnockedDown: 1, times: 20));
+
+            Sut.Score();
+
+            Expect(new GameScored(score: 20));
+        }
+
+        private static IEvent[] RollMany(int pinsKnockedDown, int times)
+        {
+            var rolls = new IEvent[times];
+
+            for (int i = 0; i < times; i++)
+                rolls[i] = new BallRolled(pinsKnockedDown);
+
+            return rolls;
+        }
     }
+
 
     public class GameScored : IEvent
     {
