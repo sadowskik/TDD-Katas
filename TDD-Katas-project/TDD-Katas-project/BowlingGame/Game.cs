@@ -14,24 +14,32 @@ namespace TDD_Katas_project.BowlingGame
         protected void When(BallRolled @event)
         {
             var newRoll = new Roll(@event.PinsKnockedDown);
+            _rolls.Add(newRoll);
 
-            if (_rolls.Count % 2 == 0)
+            if (IsLastRollThePartOfPreviousFrame())
             {
-                _frames.Add(new Frame(newRoll));
-
-                if (newRoll.PinsKnockedDown == 10)
-                {
-                    _rolls.Add(newRoll);
-                    When(new Striked());
-                    return;
-                }                                    
-            }
-            else
                 _frames.Last().SecondRoll = newRoll;
+                return;
+            }
 
+            _frames.Add(new Frame(newRoll));
+
+            if (newRoll.IsStrike())
+                When(new Striked());
+        }
+
+        protected void When(Striked @event)
+        {
+            var newRoll = new Roll(@event.PinsKnockedDown);
+            _frames.Last().SecondRoll = newRoll;
             _rolls.Add(newRoll);
         }
-        
+
+        private bool IsLastRollThePartOfPreviousFrame()
+        {
+            return (_rolls.Count - 1)%2 != 0;
+        }
+
         public void Score()
         {
             int total = 0;
@@ -41,12 +49,22 @@ namespace TDD_Katas_project.BowlingGame
                 total += _frames[i].Score();
 
                 if (_frames[i].IsStrike())
-                    total += _frames[i + 1].Score() + _frames[i + 2].Score();
+                    total += StrikeBonus(i);
                 else if (_frames[i].IsSpare())
-                    total += _frames[i + 1].FirstRoll.PinsKnockedDown;
+                    total += SpareBonus(i);
             }
 
             RaiseEvent(new GameScored(total));
+        }
+
+        private int SpareBonus(int i)
+        {
+            return _frames[i + 1].FirstRoll.PinsKnockedDown;
+        }
+
+        private int StrikeBonus(int i)
+        {
+            return _frames[i + 1].Score() + _frames[i + 2].Score();
         }
     }
 
@@ -74,7 +92,7 @@ namespace TDD_Katas_project.BowlingGame
         }
 
         public int Score()
-        {            
+        {
             return FirstRoll.PinsKnockedDown + SecondRoll.PinsKnockedDown;
         }
     }
