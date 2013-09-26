@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentAssertions">
+      <HintPath>..\packages\FluentAssertions.2.1.0.0\lib\net40\FluentAssertions.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -50,6 +53,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BowlingGame\Game.cs" />
+    <Compile Include="BowlingGame\Infrastructure\AggregateBase.cs" />
+    <Compile Include="BowlingGame\Infrastructure\IAggregate.cs" />
+    <Compile Include="BowlingGame\Infrastructure\IEvent.cs" />
+    <Compile Include="BowlingGame\Infrastructure\IMemento.cs" />
+    <Compile Include="BowlingGame\Infrastructure\IRepository.cs" />
+    <Compile Include="BowlingGame\Infrastructure\RedirectToWhen.cs" />
+    <Compile Include="BowlingGame\Infrastructure\Specification.cs" />
     <Compile Include="BowlingGame\TestGame.cs" />
     <Compile Include="FizzBuzzKata\FizzBuzz.cs" />
     <Compile Include="FizzBuzzKata\TestFizzBuzz.cs" />
