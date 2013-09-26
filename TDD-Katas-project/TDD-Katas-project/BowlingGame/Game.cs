@@ -11,16 +11,25 @@ namespace TDD_Katas_project.BowlingGame
 
         protected void When(BallRolled @event)
         {
-            var newRoll = new Roll(@event.PinsKnockedDown);            
+            var newRoll = new Roll(@event.PinsKnockedDown);
 
             if (_rolls.Count % 2 == 0)
+            {
                 _frames.Add(new Frame(newRoll));
+
+                if (newRoll.PinsKnockedDown == 10)
+                {
+                    _rolls.Add(newRoll);
+                    When(new Striked());
+                    return;
+                }                                    
+            }
             else
                 _frames.Last().SecondRoll = newRoll;
 
             _rolls.Add(newRoll);
         }
-
+        
         public void Score()
         {
             int total = 0;
@@ -29,7 +38,9 @@ namespace TDD_Katas_project.BowlingGame
             {
                 total += _frames[i].Score();
 
-                if (_frames[i].IsSpare())
+                if (_frames[i].IsStrike())
+                    total += _frames[i + 1].Score();
+                else if (_frames[i].IsSpare())
                     total += _frames[i + 1].FirstRoll.PinsKnockedDown;
             }
 
@@ -55,8 +66,13 @@ namespace TDD_Katas_project.BowlingGame
                    && SecondRoll.PinsKnockedDown == 5;
         }
 
-        public int Score()
+        public bool IsStrike()
         {
+            return FirstRoll.IsStrike();
+        }
+
+        public int Score()
+        {            
             return FirstRoll.PinsKnockedDown + SecondRoll.PinsKnockedDown;
         }
     }
@@ -69,15 +85,10 @@ namespace TDD_Katas_project.BowlingGame
         {
             PinsKnockedDown = pinsKnockedDown;
         }
-    }
 
-    public class GameScored : IEvent
-    {
-        public int Score { get; private set; }
-
-        public GameScored(int score)
+        public bool IsStrike()
         {
-            Score = score;
+            return PinsKnockedDown == 10;
         }
     }
 
@@ -88,6 +99,23 @@ namespace TDD_Katas_project.BowlingGame
         public BallRolled(int pinsKnockedDown)
         {
             PinsKnockedDown = pinsKnockedDown;
+        }
+    }
+
+    public class Striked : BallRolled
+    {
+        public Striked() : base(0)
+        {
+        }
+    }
+
+    public class GameScored : IEvent
+    {
+        public int Score { get; private set; }
+
+        public GameScored(int score)
+        {
+            Score = score;
         }
     }
 }

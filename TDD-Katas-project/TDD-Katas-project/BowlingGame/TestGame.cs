@@ -49,6 +49,21 @@ namespace TDD_Katas_project.BowlingGame
             Expect(new GameScored(16));
         }
 
+        [Test]
+        public void Should_Score_Game_With_One_Strike()
+        {
+            //TODO: make cleaner
+            Given(
+                Strike(),
+                new IEvent[] { new BallRolled(pinsKnockedDown: 3) },
+                new IEvent[] { new BallRolled(pinsKnockedDown: 4) },
+                RollMany(pinsKnockedDown: 0, times: 16));
+
+            Sut.Score();
+
+            Expect(new GameScored(24));
+        }
+
         private static IEnumerable<BallRolled> RollMany(int pinsKnockedDown, int times)
         {            
             for (int i = 0; i < times; i++)
@@ -61,6 +76,14 @@ namespace TDD_Katas_project.BowlingGame
             {
                 new BallRolled(pinsKnockedDown: 5),
                 new BallRolled(pinsKnockedDown: 5)                
+            };
+        }
+
+        private static IEvent[] Strike()
+        {
+            return new IEvent[]
+            {
+                new BallRolled(pinsKnockedDown: 10),                              
             };
         }
     }    
